@@ -6,7 +6,8 @@ import { Modal, TextInput, Button } from "flowbite-react";
 import { useNavigate } from "react-router-dom";
 import { AppContext } from "../context/AppContext";
 import { useMutation } from "react-query";
-import { API } from "../config/api";
+import { API, setAuthToken } from "../config/api";
+import Swal from "sweetalert2";
 
 // import component here
 
@@ -37,7 +38,7 @@ export default function ModalLogin({ show, showLogin, showSignup }) {
     try {
       e.preventDefault();
 
-      const response = await API.post("/login", form);
+      const  response  = await API.post("/login", form);
       console.log("login success :", response);
 
       if (response.data != null) {
@@ -45,18 +46,31 @@ export default function ModalLogin({ show, showLogin, showSignup }) {
           type: "LOGIN_SUCCESS",
           payload: response.data.data.user,
         });
-        alert("Welcome Byack");
+        setAuthToken(localStorage.token);
+        Swal.fire({
+          icon: "success",
+          title: "Welcome BYACK",
+        });
         navigate("/");
       }
     } catch (error) {
       console.log(error);
-      alert("login failed");
+      Swal.fire({
+        icon: "error",
+        title: "MATAMU PICEK",
+      });
     }
   });
 
   return (
     <>
-      <Modal size="sm" show={show} popup={true} onClose={handleClose}>
+      <Modal
+        size="sm"
+        show={show}
+        dismissible
+        popup={true}
+        onClose={handleClose}
+      >
         <Modal.Header />
         <Modal.Body>
           <h1 className="text-xl text-center font-semibold text-[#2FC4B2]">
@@ -91,7 +105,6 @@ export default function ModalLogin({ show, showLogin, showSignup }) {
                 type="submit"
                 gradientMonochrome="success"
                 className="w-full"
-
               >
                 Login
               </Button>

@@ -2,10 +2,9 @@ package handlers
 
 import (
 	"context"
-	"io"
-	"io/ioutil"
 	dto "juna/dto/result"
 	usersdto "juna/dto/users"
+	"juna/models"
 	"juna/repositories"
 	"mime/multipart"
 	"net/http"
@@ -42,7 +41,6 @@ func (h *handlerUser) GetUser(c echo.Context) error {
 func (h *handlerUser) UpdateProfile(c echo.Context) error {
 	var (
 		avatarFile, artFile *multipart.FileHeader
-		avatarPath, artPath string
 	)
 
 	form, err := c.MultipartForm()
@@ -60,48 +58,6 @@ func (h *handlerUser) UpdateProfile(c echo.Context) error {
 		artFile = files[0]
 	}
 
-	// Handle avatar file upload
-	if avatarFile != nil {
-		avatarSrc, err := avatarFile.Open()
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()})
-		}
-		defer avatarSrc.Close()
-
-		avatarTempFile, err := ioutil.TempFile("uploads", "avatar-*.png")
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()})
-		}
-		defer avatarTempFile.Close()
-
-		if _, err := io.Copy(avatarTempFile, avatarSrc); err != nil {
-			return c.JSON(http.StatusBadRequest, dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()})
-		}
-
-		avatarPath = avatarTempFile.Name()
-	}
-
-	// Handle art file upload
-	if artFile != nil {
-		artSrc, err := artFile.Open()
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()})
-		}
-		defer artSrc.Close()
-
-		artTempFile, err := ioutil.TempFile("uploads", "art-*.png")
-		if err != nil {
-			return c.JSON(http.StatusBadRequest, dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()})
-		}
-		defer artTempFile.Close()
-
-		if _, err := io.Copy(artTempFile, artSrc); err != nil {
-			return c.JSON(http.StatusBadRequest, dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()})
-		}
-
-		artPath = artTempFile.Name()
-	}
-
 	// Upload files to Cloudinary
 	var ctx = context.Background()
 	var CLOUD_NAME = os.Getenv("CLOUD_NAME")
@@ -111,16 +67,30 @@ func (h *handlerUser) UpdateProfile(c echo.Context) error {
 
 	var avatarURL string
 	var artURL string
-	if avatarPath != "" {
-		avatarResp, err := cld.Upload.Upload(ctx, avatarPath, uploader.UploadParams{Folder: "WaysGallery_Profile_picture"})
+	if avatarFile != nil {
+		avatarSrc, err := avatarFile.Open()
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()})
+		}
+		defer avatarSrc.Close()
+
+		// Upload avatar file directly to Cloudinary
+		avatarResp, err := cld.Upload.Upload(ctx, avatarSrc, uploader.UploadParams{Folder: "WaysGallery_Profile_picture"})
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()})
 		}
 		avatarURL = avatarResp.SecureURL
 	}
 
-	if artPath != "" {
-		artResp, err := cld.Upload.Upload(ctx, artPath, uploader.UploadParams{Folder: "WaysGallery_Art"})
+	if artFile != nil {
+		artSrc, err := artFile.Open()
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()})
+		}
+		defer artSrc.Close()
+
+		// Upload art file directly to Cloudinary
+		artResp, err := cld.Upload.Upload(ctx, artSrc, uploader.UploadParams{Folder: "WaysGallery_Art"})
 		if err != nil {
 			return c.JSON(http.StatusBadRequest, dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()})
 		}
@@ -191,14 +161,36 @@ func (h *handlerUser) GetUserDetailByLogin(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()})
 	}
 
+	// Jika user.Followers nil, ubah menjadi slice kosong
+	var followers []models.User
+	if user.Followers != nil {
+		for _, f := range user.Followers {
+			followers = append(followers, *f)
+		}
+	} else {
+		followers = []models.User{}
+	}
+
+	// Jika user.Following nil, ubah menjadi slice kosong
+	var following []models.User
+	if user.Following != nil {
+		for _, f := range user.Following {
+			following = append(following, *f)
+		}
+	} else {
+		following = []models.User{}
+	}
+
 	return c.JSON(http.StatusOK, dto.SuccesResult{Code: http.StatusOK, Data: usersdto.UserDetailResponse{
-		ID:       int(user.ID),
-		Fullname: user.Fullname,
-		Email:    user.Email,
-		Greeting: user.Greeting,
-		Avatar:   user.Avatar,
-		Post:     posts,
-		Arts:     user.Art,
+		ID:        int(user.ID),
+		Fullname:  user.Fullname,
+		Email:     user.Email,
+		Greeting:  user.Greeting,
+		Avatar:    user.Avatar,
+		Post:      posts,
+		Arts:      user.Art,
+		Followers: followers,
+		Following: following,
 	}})
 }
 
@@ -215,13 +207,70 @@ func (h *handlerUser) GetUserDetailById(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()})
 	}
 
+	// Jika user.Followers nil, ubah menjadi slice kosong
+	var followers []models.User
+	if user.Followers != nil {
+		for _, f := range user.Followers {
+			followers = append(followers, *f)
+		}
+	} else {
+		followers = []models.User{}
+	}
+
+	// Jika user.Following nil, ubah menjadi slice kosong
+	var following []models.User
+	if user.Following != nil {
+		for _, f := range user.Following {
+			following = append(following, *f)
+		}
+	} else {
+		following = []models.User{}
+	}
+
 	return c.JSON(http.StatusOK, dto.SuccesResult{Code: http.StatusOK, Data: usersdto.UserDetailResponse{
-		ID:       int(user.ID),
-		Fullname: user.Fullname,
-		Email:    user.Email,
-		Greeting: user.Greeting,
-		Avatar:   user.Avatar,
-		Post:     posts,
-		Arts:     user.Art,
+		ID:        int(user.ID),
+		Fullname:  user.Fullname,
+		Email:     user.Email,
+		Greeting:  user.Greeting,
+		Avatar:    user.Avatar,
+		Post:      posts,
+		Arts:      user.Art,
+		Followers: followers,
+		Following: following,
 	}})
+}
+
+func (h *handlerUser) FollowUser(c echo.Context) error {
+	userLogin := c.Get("userLogin")
+	userId := userLogin.(jwt.MapClaims)["id"].(float64)
+	followerID, _ := strconv.Atoi(c.Param("followerID"))
+
+	// Konversi userID dan followerID ke tipe data yang sesuai (misalnya int)
+	// Jika diperlukan, Anda bisa menggunakan strconv.Atoi(userID) untuk mengubahnya menjadi int
+
+	// Panggil fungsi FollowUser dari repository
+	if err := h.UserRepository.FollowUser(int(userId), followerID); err != nil {
+		// Tangani error jika diperlukan
+		return c.String(http.StatusInternalServerError, "Error following user")
+	}
+
+	// Jika berhasil, kembalikan respon OK
+	return c.String(http.StatusOK, "Successfully followed user")
+}
+
+func (h *handlerUser) UnfollowUser(c echo.Context) error {
+	userLogin := c.Get("userLogin")
+	userIdFloat64 := userLogin.(jwt.MapClaims)["id"].(float64)
+	userId := int(userIdFloat64)
+
+	followerID, err := strconv.Atoi(c.Param("followerID"))
+	if err != nil {
+		return c.String(http.StatusBadRequest, "Invalid follower ID")
+	}
+
+	if err := h.UserRepository.UnfollowUser(userId, followerID); err != nil {
+		return c.String(http.StatusInternalServerError, "Error unfollowing user")
+	}
+
+	return c.String(http.StatusOK, "Successfully unfollowed user")
 }

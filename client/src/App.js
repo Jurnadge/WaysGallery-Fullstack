@@ -1,4 +1,4 @@
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 
 // import component here
@@ -16,21 +16,17 @@ import Order from "./pages/Order";
 import DetailUser from "./pages/DetailUser";
 
 function App() {
-  const navigate = useNavigate();
   const [state, dispatch] = useContext(AppContext);
   const [isLoading, setIsLoading] = useState(true);
 
-  if (localStorage.token) {
-    setAuthToken(localStorage.token);
-  }
-
   useEffect(() => {
-    if (state.isLogin === false) {
-      navigate("/landing");
+    if (localStorage.token) {
+      setAuthToken(localStorage.token);
+      checkUser();
     } else {
-      navigate("/");
+      setIsLoading(false);
     }
-  }, [state]);
+  }, []);
 
   const checkUser = async () => {
     try {
@@ -52,34 +48,30 @@ function App() {
       setIsLoading(false);
     } catch (error) {
       console.log(error);
+      dispatch({
+        type: "AUTH_ERROR",
+      });
       setIsLoading(false);
     }
   };
-
-  useEffect(() => {
-    if (localStorage.token) {
-      checkUser();
-    }
-    setIsLoading(false);
-  }, []);
 
   return (
     <>
       {isLoading ? (
         <>
-          <h1>Lagi Loading</h1>
+          <h1 className="w-full h-full text-9xl">Lagi Loading</h1>
         </>
       ) : (
         <Routes>
           <Route path="/landing" element={<LandingPage />} />
 
-          <Route element={<PrivateRoute />}>
+          <Route exact path="/" element={<PrivateRoute />}>
             <Route exact path="/" element={<HomePage />} />
             <Route exact path="/profile" element={<Profile />} />
             <Route exact path="/edit-profile" element={<EditProfile />} />
             <Route exact path="/uploads" element={<Uploads />} />
             <Route exact path="/detail/:id" element={<DetailPost />} />
-            <Route exact path="/hire" element={<HireForm />} />
+            <Route exact path="/hire/:id" element={<HireForm />} />
             <Route exact path="/order" element={<Order />} />
             <Route exact path="/detail-user/:id" element={<DetailUser />} />
           </Route>

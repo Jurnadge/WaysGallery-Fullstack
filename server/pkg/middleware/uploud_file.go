@@ -1,8 +1,6 @@
 package middleware
 
 import (
-	"io"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -23,18 +21,6 @@ func UploadFile(next echo.HandlerFunc) echo.HandlerFunc {
 					return c.JSON(http.StatusBadRequest, err)
 				}
 				defer src.Close()
-
-				tempFile, err := ioutil.TempFile("uploads", "image-*.png")
-				if err != nil {
-					return c.JSON(http.StatusBadRequest, err)
-				}
-				defer tempFile.Close()
-
-				if _, err := io.Copy(tempFile, src); err != nil {
-					return c.JSON(http.StatusBadRequest, err)
-				}
-
-				dataFiles = append(dataFiles, tempFile.Name())
 			}
 		}
 

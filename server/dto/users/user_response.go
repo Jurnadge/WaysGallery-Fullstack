@@ -9,13 +9,15 @@ type UpdateResponse struct {
 }
 
 type UserDetailResponse struct {
-	ID       int           `json:"id"`
-	Fullname string        `json:"fullname"`
-	Email    string        `json:"email"`
-	Avatar   string        `json:"avatar"`
-	Greeting string        `json:"greeting"`
-	Post     []models.Post `json:"posts"`
-	Arts     string        `json:"arts"`
+	ID        int           `json:"id"`
+	Fullname  string        `json:"fullname"`
+	Email     string        `json:"email"`
+	Avatar    string        `json:"avatar"`
+	Greeting  string        `json:"greeting"`
+	Post      []models.Post `json:"posts"`
+	Arts      string        `json:"arts"`
+	Followers []models.User `json:"followers"`
+	Following []models.User `json:"following"`
 }
 
 type UserPostResponse struct {

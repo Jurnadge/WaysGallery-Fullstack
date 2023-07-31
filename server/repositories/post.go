@@ -19,7 +19,7 @@ func RepositoryPost(db *gorm.DB) *repository {
 // get post
 func (r *repository) GetPost(ID int) (models.Post, error) {
 	var post models.Post
-	err := r.db.Debug().Preload("PostImage").Preload("User").First(&post, ID).Error
+	err := r.db.Debug().Preload("PostImage").Preload("User").Preload("User.Followers").Preload("User.Following").First(&post, ID).Error
 
 	return post, err
 }

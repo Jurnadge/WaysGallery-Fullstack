@@ -56,7 +56,13 @@ export default function ModalRegister({ show, showLogin, showSignup }) {
 
   return (
     <>
-      <Modal show={show} popup={true} size="sm" onClose={handleClose}>
+      <Modal
+        show={show}
+        popup={true}
+        dismissible
+        size="sm"
+        onClose={handleClose}
+      >
         <Modal.Header />
         <Modal.Body>
           <h1 className="text-xl text-center font-semibold text-[#2FC4B2]">

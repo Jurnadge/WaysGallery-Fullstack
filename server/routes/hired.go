@@ -14,4 +14,7 @@ func HiredRoutes(e *echo.Group) {
 	h := handlers.HandlerHired(hiredRepository)
 
 	e.POST("/hired", middleware.Auth(h.CreateHired))
+	e.POST("/notification", h.Notification)
+	e.GET("/offer", middleware.Auth(h.GetOffer))
+	e.GET("/order", middleware.Auth(h.GetOrder))
 }

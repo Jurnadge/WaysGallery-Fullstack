@@ -6,16 +6,11 @@ import bigLogo from "../assets/images/LogoLandPage.png";
 import { Link } from "react-router-dom";
 import { useContext } from "react";
 import { AppContext } from "../context/AppContext";
-import { useQuery } from "react-query";
-import { API } from "../config/api";
+import { setAuthToken } from "../config/api";
 
 export default function Header() {
+  setAuthToken(localStorage.token);
   const [state, dispatch] = useContext(AppContext);
-
-  const { data: dataNavbar } = useQuery("datanavbarcache", async () => {
-    const response = await API.get("/user/" + state.user.ID);
-    return response.data.data;
-  });
 
   const logout = () => {
     dispatch({
@@ -41,10 +36,16 @@ export default function Header() {
         <Dropdown
           arrowIcon={false}
           inline={true}
-          label={<Avatar alt="User settings" img={dataNavbar?.avatar} rounded={true}/>}
+          label={
+            <Avatar
+              alt="User settings"
+              img={state?.user.image}
+              rounded={true}
+            />
+          }
         >
           <Link to={"/profile"}>
-            <Dropdown.Item>Profile {dataNavbar?.fullname}</Dropdown.Item>
+            <Dropdown.Item>Profile {state?.user.fullname}</Dropdown.Item>
           </Link>
           <Link to={"/order"}>
             <Dropdown.Item>Order</Dropdown.Item>

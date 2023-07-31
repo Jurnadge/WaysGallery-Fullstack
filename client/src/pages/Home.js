@@ -3,17 +3,29 @@ import Header from "../component/Header";
 import searchLogo from "../assets/images/search.svg";
 
 //component here
-import { API } from "../config/api";
+import { API, setAuthToken } from "../config/api";
 
 //react here
 import { Link } from "react-router-dom";
 import { useQuery } from "react-query";
+import { useContext, useEffect } from "react";
+import { AppContext } from "../context/AppContext";
 
 export default function HomePage() {
-  const { data: post } = useQuery("postCache", async () => {
+  const [state] = useContext(AppContext);
+
+  const { data: post, refetch } = useQuery("postCache", async () => {
     const response = await API.get("/posts");
     return response.data.data.post;
   });
+
+  useEffect(() => {
+    if (state.isLogin === true) {
+      const token = localStorage.token;
+      setAuthToken(token);
+      refetch();
+    }
+  }, [state, refetch]);
 
   // for naming alt image (must be used for the next project, but for now, im still confuse about this function)
   // const thumbnail = Array.isArray(post)
@@ -67,7 +79,8 @@ export default function HomePage() {
               {item.post_image
                 ?.map((img, index) => (
                   <img
-                    src={img.image} key={index}
+                    src={img.image}
+                    key={index}
                     className="w-full mb-5 rounded-md hover:shadow-lg hover:shadow-green-500 hover:transition-shadow hover:ease-in-out hover:scale-110 duration-1000"
                     alt=""
                   />

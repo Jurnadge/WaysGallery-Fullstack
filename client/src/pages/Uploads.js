@@ -40,6 +40,9 @@ export default function Uploads() {
     if (event.target.files.length > 5) {
       event.target.value = null;
       return alert("Only 5 images are allowed at a time");
+    } else if (event.target.files.size > 10e6) {
+      event.target.value = null;
+      return alert("max file size 10mb");
     }
 
     const images = Array.from(event.target.files);
@@ -93,19 +96,12 @@ export default function Uploads() {
             navigate("/");
           }
         });
-      } else {
-        Swal.fire({
-          title: "Error",
-          text: "Please try again",
-          icon: "error",
-          confirmButtonText: "OK",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            navigate("/uploads");
-          }
-        });
       }
     } catch (error) {
+      Swal.fire({
+        title: error.response.data.message,
+        icon: "error",
+      });
       console.log(error);
     }
   });
@@ -122,7 +118,7 @@ export default function Uploads() {
                   <div className="flex items-center justify-center w-full h-96 border-2 border-gray-300 border-dashed rounded-md cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
                     <label>
                       <img
-                        src={selectedFiles[0].image}
+                        src={selectedFiles[0]?.image}
                         alt=""
                         className="object-cover full-w h-96 object-center"
                       />
@@ -141,44 +137,40 @@ export default function Uploads() {
                     <div className="flex items-center justify-center w-full h-36 border-2 border-gray-300 border-dashed rounded-md cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
                       <label>
                         <img
-                          src={selectedFiles[1].image}
+                          src={selectedFiles[1]?.image}
                           alt=""
                           className="object-cover object-center"
                         />
-                        
                       </label>
                     </div>
 
                     <div className="flex items-center justify-center w-full h-36 border-2 border-gray-300 border-dashed rounded-md cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
                       <label>
                         <img
-                          src={selectedFiles[2].image}
+                          src={selectedFiles[2]?.image}
                           alt=""
                           className="object-cover object-center"
                         />
-                        
                       </label>
                     </div>
 
                     <div className="flex items-center justify-center w-full h-36 border-2 border-gray-300 border-dashed rounded-md cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
                       <label>
                         <img
-                          src={selectedFiles[3].image}
+                          src={selectedFiles[3]?.image}
                           alt=""
                           className="object-cover object-center"
                         />
-                        
                       </label>
                     </div>
 
                     <div className="flex items-center justify-center w-full h-36 border-2 border-gray-300 border-dashed rounded-md cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
                       <label>
                         <img
-                          src={selectedFiles[4].image}
+                          src={selectedFiles[4]?.image}
                           alt=""
                           className="object-cover object-center"
                         />
-                        
                       </label>
                     </div>
                   </div>
@@ -213,7 +205,6 @@ export default function Uploads() {
                           alt=""
                           className="object-cover object-center"
                         />
-                        
                       </label>
                     </div>
 
@@ -224,7 +215,6 @@ export default function Uploads() {
                           alt=""
                           className="object-cover object-center"
                         />
-                        
                       </label>
                     </div>
 
@@ -235,7 +225,6 @@ export default function Uploads() {
                           alt=""
                           className="object-cover object-center"
                         />
-                        
                       </label>
                     </div>
 
@@ -246,7 +235,6 @@ export default function Uploads() {
                           alt=""
                           className="object-cover object-center"
                         />
-                        
                       </label>
                     </div>
                   </div>
