@@ -1,8 +1,10 @@
-import { Button, Dropdown, Table } from "flowbite-react";
+import { Button } from "flowbite-react";
 import Header from "../component/Header";
 import { API } from "../config/api";
-import { useQuery } from "react-query";
 import { useEffect, useState } from "react";
+
+// parsing date using moment.js
+import moment from "moment";
 
 export default function Order() {
   const [selectedOption, setSelectedOption] = useState("My Order");
@@ -63,8 +65,12 @@ export default function Order() {
                     <td className="border-2">{index + 1}</td>
                     <td className="border-2">{item.orderBy.fullname}</td>
                     <td className="border-2">{item.title}</td>
-                    <td className="border-2">{item.startProject}</td>
-                    <td className="border-2">{item.endProject}</td>
+                    <td className="border-2">
+                      {moment(item.startProject).format("DD MMMM YYYY")}
+                    </td>
+                    <td className="border-2">
+                      {moment(item.endProject).format("DD MMMM YYYY")}
+                    </td>
                     <td className="border-2">{item.status}</td>
                     <td className="border-2">
                       {item?.status === "pending" ? (
@@ -101,8 +107,12 @@ export default function Order() {
                     <td className="border-2">{index + 1}</td>
                     <td className="border-2">{item.orderBy.fullname}</td>
                     <td className="border-2">{item.title}</td>
-                    <td className="border-2">{item.startProject}</td>
-                    <td className="border-2">{item.endProject}</td>
+                    <td className="border-2">
+                      {moment(item.startProject).format("DD MMMM YYYY")}
+                    </td>
+                    <td className="border-2">
+                      {moment(item.endProject).format("DD MMMM YYYY")}
+                    </td>
                     <td className="border-2">{item.status}</td>
                     <td className="border-2">
                       <div className="flex">
