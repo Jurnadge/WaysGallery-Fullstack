@@ -26,8 +26,6 @@ export default function HomePage() {
     return response.data.data.post;
   });
 
-  console.log("data post", post);
-
   const handleSearch = (e) => {
     e.preventDefault();
     const search = post.filter((item) => {
@@ -53,8 +51,6 @@ export default function HomePage() {
       refetch();
     }
   }, [state, refetch]);
-
-  console.log("fil", filSearch.list);
 
   // for naming alt image (must be used for the next project, but for now, im still confuse about this function)
   // const thumbnail = Array.isArray(post)
