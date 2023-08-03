@@ -14,8 +14,6 @@ import { AppContext } from "../context/AppContext";
 export default function HomePage() {
   const [state] = useContext(AppContext);
 
-  const [follFilter, setFollFilter] = useState();
-
   const [filSearch, setFilSearch] = useState({
     query: "",
     list: [],

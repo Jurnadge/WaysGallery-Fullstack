@@ -5,7 +5,6 @@ import (
 	"juna/database"
 	"juna/pkg/mysql"
 	"juna/routes"
-	"log"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -14,17 +13,11 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	godotenv.Load()
 
 	e := echo.New()
 
-	PORT := os.Getenv("PORT")
-
 	mysql.DatabaseInit()
-
 	database.RunMigration()
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
@@ -35,8 +28,11 @@ func main() {
 
 	routes.RouteInit(e.Group("/api/v1"))
 
-	e.Static("/uploads", "./uploads")
+	var PORT = os.Getenv("PORT")
+	if PORT == "" {
+		PORT = "8080"
+	}
 
 	fmt.Println("Server is running on http://" + ":" + PORT)
-	e.Logger.Fatal(e.Start("localhost:" + PORT))
+	e.Logger.Fatal(e.Start(":" + PORT))
 }

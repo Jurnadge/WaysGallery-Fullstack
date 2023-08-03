@@ -9,7 +9,6 @@ export default function Order() {
   const [dataOrder, setDataOrder] = useState([]);
   const [dataOffer, setDataOffer] = useState([]);
 
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -25,8 +24,8 @@ export default function Order() {
     fetchData();
   }, []);
 
-  const handleSelectChange = (event) => {
-    setSelectedOption(event.target.value);
+  const handleSelectChange = (e) => {
+    setSelectedOption(e.target.value);
   };
 
   return (
