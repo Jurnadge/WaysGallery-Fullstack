@@ -47,7 +47,18 @@ func (h *handlerHired) CreateHired(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()})
 	}
 
+	var transactionIsMatch = false
+	var transactionId int
+	for !transactionIsMatch {
+		transactionId = int(time.Now().Unix())
+		transactionData, _ := h.HiredRepository.GetHired(transactionId)
+		if transactionData.ID == 0 {
+			transactionIsMatch = true
+		}
+	}
+
 	hired := models.Hired{
+		ID:           transactionId,
 		Title:        request.Title,
 		Description:  request.Description,
 		StartProject: startProject,

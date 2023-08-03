@@ -8,6 +8,7 @@ import (
 
 type Hired struct {
 	gorm.Model
+	ID           int
 	Title        string    `json:"title" gorm:"type: varchar(255)"`
 	Description  string    `json:"description" gorm:"type: text"`
 	StartProject time.Time `json:"startProject"`

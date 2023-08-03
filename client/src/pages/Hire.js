@@ -118,10 +118,10 @@ export default function HireForm() {
             <div className="flex justify-between justify-center mt-4">
               <div className="w-full me-5">
                 <TextInput
-                  type="text"
+                  type="date"
                   placeholder="Start Date"
-                  onFocus={(e) => (e.target.type = "date")}
-                  onBlur={(e) => (e.target.type = "text")}
+                  // onFocus={(e) => (e.target.type = "date")}
+                  // onBlur={(e) => (e.target.type = "text")}
                   name="startProject"
                   onChange={handleChange}
                   value={startProject}
@@ -129,10 +129,10 @@ export default function HireForm() {
               </div>
               <div className="w-full ms-5">
                 <TextInput
-                  type="text"
+                  type="date"
                   placeholder="End Date"
-                  onFocus={(e) => (e.target.type = "date")}
-                  onBlur={(e) => (e.target.type = "text")}
+                  // onFocus={(e) => (e.target.type = "date")}
+                  // onBlur={(e) => (e.target.type = "text")}
                   name="endProject"
                   onChange={handleChange}
                   value={endProject}
