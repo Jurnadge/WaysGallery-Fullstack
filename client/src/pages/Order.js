@@ -5,30 +5,12 @@ import { useEffect, useState } from "react";
 
 // parsing date using moment.js
 import moment from "moment";
+import { useFetchOrder } from "../lib/CustomHooks";
+
 
 export default function Order() {
-  const [selectedOption, setSelectedOption] = useState("My Order");
-  const [dataOrder, setDataOrder] = useState([]);
-  const [dataOffer, setDataOffer] = useState([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const orderResponse = await API.get("/order");
-        const offerResponse = await API.get("/offer");
-        setDataOrder(orderResponse.data.hired);
-        setDataOffer(offerResponse.data.hired);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  const handleSelectChange = (e) => {
-    setSelectedOption(e.target.value);
-  };
+  const { selectedOption, dataOrder, dataOffer, handleSelectChange } =
+    useFetchOrder();
 
   return (
     <>

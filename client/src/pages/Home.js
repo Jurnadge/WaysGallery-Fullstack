@@ -10,45 +10,10 @@ import { Link } from "react-router-dom";
 import { useQuery } from "react-query";
 import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../context/AppContext";
+import { useFetchHome } from "../lib/CustomHooks";
 
 export default function HomePage() {
-  const [state] = useContext(AppContext);
-
-  const [filSearch, setFilSearch] = useState({
-    query: "",
-    list: [],
-  });
-
-  const { data: post, refetch } = useQuery("postCache", async () => {
-    const response = await API.get("/posts");
-    return response.data.data.post;
-  });
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    const search = post.filter((item) => {
-      if (e.target.value === "") return post;
-      return (
-        item.user.fullname
-          .toLowerCase()
-          .includes(e.target.value.toLowerCase()) ||
-        item.title.toLowerCase().includes(e.target.value.toLowerCase()) ||
-        item.description.toLowerCase().includes(e.target.value.toLowerCase())
-      );
-    });
-    setFilSearch({
-      query: e.target.value,
-      list: search,
-    });
-  };
-
-  useEffect(() => {
-    if (state.isLogin === true) {
-      const token = localStorage.token;
-      setAuthToken(token);
-      refetch();
-    }
-  }, [state, refetch]);
+  const { filSearch, isLoading, error, post, handleSearch } = useFetchHome();
 
   // for naming alt image (must be used for the next project, but for now, im still confuse about this function)
   // const thumbnail = Array.isArray(post)
@@ -114,7 +79,8 @@ export default function HomePage() {
             </Link>
           ))}
         </div> */}
-
+        {error && <div>{error}</div>}
+        {isLoading && <div>Loading...</div>}
         <div class="columns-2 md:columns-3 lg:columns-4 mt-20 mb-20">
           {filSearch.query === "" ? (
             <>
